@@ -1,0 +1,16 @@
+.tileBagContainer {
+  background: rgba(173, 216, 230, 0.37);
+
+  border-radius: 0.3rem;
+  padding: 1rem;
+}
+
+.tileBagActions {
+  margin-bottom: 1rem;
+}
+
+.drawnTilesContainer {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}

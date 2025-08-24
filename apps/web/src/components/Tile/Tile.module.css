@@ -1,0 +1,10 @@
+.tile {
+  text-align: center;
+  border: 1px solid black;
+  padding: 0.33rem;
+  /* min-width: 40px; */
+}
+
+.selected {
+  background: red;
+}

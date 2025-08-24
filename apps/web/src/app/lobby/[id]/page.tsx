@@ -1,9 +1,5 @@
-import { Board } from "@/components/Board";
+import { LobbyComponent } from "@/components/Lobby";
 
-export default function Lobby() {
-  return (
-    <div>
-      <Board />
-    </div>
-  );
+export default function LobbyPage() {
+  return <LobbyComponent></LobbyComponent>;
 }
