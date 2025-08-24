@@ -2,27 +2,90 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, staging]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: false
+        type: choice
+        options: [development, staging, production]
+        default: ""
 
 jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.pick.outputs.environment }}
+    steps:
+      - id: pick
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.environment }}" ]; then
+            env="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.base_ref }}" = "main" ]; then
+            env="production"
+          elif [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.base_ref }}" = "staging" ]; then
+            env="staging"
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            env="production"
+          elif [ "${{ github.ref_name }}" = "staging" ]; then
+            env="staging"
+          else
+            env="development"
+          fi
+          echo "environment=$env" >> "$GITHUB_OUTPUT"
+          echo "Resolved environment: $env"
+
   build:
     name: Build
+    needs: resolve
     runs-on: ubuntu-latest
+    environment: ${{ needs.resolve.outputs.environment }}
+    outputs:
+      env: ${{needs.resolve.outputs.environment}}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Show selection
+        run: |
+          echo "ref_name=${{ github.ref_name }}"
+          echo "base_ref=${{ github.base_ref }}"
+          echo "manual=${{ github.event.inputs.environment }}"
+          echo "effective=${{ needs.resolve.outputs.environment }}"
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: npm
 
-      - name: Install dependencies
-        run: npm install
-
+      - run: npm install
       - run: npx nx run-many -t build
+
+  deploy-api:
+    name: Deploy API
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.build.outputs.env }}
+    if: needs.build.outputs.build_api == 'true'
+    steps:
+      - name: Download api artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api-${{ github.sha }}
+          path: api
+
+      - name: Show context
+        run: |
+          echo "Deploying API"
+          echo "ENV=${{ needs.build.outputs.env }}"
+          ls -la api | head -50
+
+      - name: Deploy API
+        env:
+          ENV: ${{ needs.build.outputs.env }}
+          GIT_SHA: ${{ github.sha }}
+
+        run: echo "Deploy"
