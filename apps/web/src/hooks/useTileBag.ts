@@ -61,10 +61,12 @@ export default function useTileBag() {
 
   return {
     tileBag,
+    setTileBag,
     resetBag,
     removeTilesFromBag,
     findTileByCoordinate,
     drawRandomTile,
     drawnTiles,
+    lastDrawnTile,
   };
 }

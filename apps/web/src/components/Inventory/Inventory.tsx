@@ -1,5 +1,4 @@
 "use client";
-import { Tile } from "../Tile";
 import styles from "./Inventory.module.css";
 
 export default function Inventory() {

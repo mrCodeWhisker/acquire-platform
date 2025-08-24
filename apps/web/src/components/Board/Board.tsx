@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "./Board.module.css";
 import { Tile } from "../Tile";
 import type { ITile } from "../Tile";
-import { useBoardTiles } from "@/hooks/useBoardTiles";
 import { useGame } from "@/contexts/GameContext";
 
 export const ROWS = 9;
