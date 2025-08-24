@@ -1,8 +1,28 @@
-html {
-  margin: 0;
-  padding: 0;
+:root {
+  --text-primary: white;
+  --font-size-primary: 1rem;
+  --background-dark: #585858;
 }
 
-body {
-  margin: 0;
+html {
+  font-size: var(--font-size-primary);
+  color: var(--text-primary);
+  background: var(--background-dark);
+}
+
+a {
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
